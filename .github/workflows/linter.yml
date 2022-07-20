@@ -14,4 +14,4 @@ jobs:
         uses: github/super-linter@v3
         env: 
           DEFAULT_BRANCH: main
-          GITHUB_TOKEN: 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
+          GITHUB_TOKEN: gotyoumate
