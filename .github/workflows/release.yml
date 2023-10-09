@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Use Node 20
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          registry-url: 'https://npm.pkg.github.com'
+          cache: 'yarn'
+          cache-dependency-path: ../../yarn.lock
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Check for Version Change
+        id: check-version
+        run: |
+          if [[ $(git diff main package.json) ]]; then
+            echo "version_changed=true" >> $GITHUB_ENV
+          fi
+        continue-on-error: true
+
+      - name: Release
+        if: env.version_changed == 'true'
+        run: |
+          version=$(node -p "require('./package.json').version")
+          git tag "v$version"
+          git push --tags
